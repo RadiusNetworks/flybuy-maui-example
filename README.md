@@ -1,2 +1,2 @@
-# flybuy-maui-example
-Flybuy example app using .Net MAUI and Xamarin SDK bindings
+# Flybuy MAUI Example
+Flybuy example app using .Net MAUI and Flybuy SDK bindings
