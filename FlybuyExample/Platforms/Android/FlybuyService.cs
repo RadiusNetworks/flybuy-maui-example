@@ -51,14 +51,10 @@ namespace FlybuyExample
             //var pickupWindow = new FlyBuy.Data.PickupWindow(x);
             
             var builder = new OrderOptions.Builder(customer.Name);
-            builder.SetCustomerPhone(customer.Phone)
-                .SetCustomerCarColor(customer.CarColor)
-                .SetCustomerCarType(customer.CarType)
-                .SetCustomerCarPlate(customer.CarLicense)
-                .SetPartnerIdentifier(order.Number)
-                //.SetPickupWindow(pickupWindow)
-                .SetState("created")
-                .SetPickupType(order.PickupType);
+            builder.SetCustomerPhone(customer.Phone).SetCustomerCarColor(customer.CarColor)
+                .SetCustomerCarType(customer.CarType).SetCustomerCarPlate(customer.CarLicense)
+                .SetPartnerIdentifier(order.Number)//.SetPickupWindow(pickupWindow)
+                .SetState("created").SetPickupType(order.PickupType);
             Core.orders!.Create(order.SiteId(), 
                 builder.Build(), 
                 OrderCallback);
@@ -73,18 +69,17 @@ namespace FlybuyExample
 
         public void ClaimOrder(Order order, Customer customer)
         {
-            Core.orders!.Claim(
-                order.Code,
-                CustomerInfo(customer),
-                order.PickupType,
-                OrderCallback);
+            var builder = new OrderOptions.Builder(customer.Name).SetCustomerPhone(customer.Phone)
+                .SetCustomerCarColor(customer.CarColor).SetCustomerCarType(customer.CarType)
+                .SetCustomerCarPlate(customer.CarLicense).SetPickupType(order.PickupType);
+
+            Core.orders!.Claim(order.Code, builder.Build(), OrderCallback);
         }
 
         public void UpdateOrder(Order order, string customerState)
         {
             Core.orders!.UpdateCustomerState(
-                order.Id,
-                customerState,
+                order.Id, customerState,
                 OrderCallback);
         }
 
