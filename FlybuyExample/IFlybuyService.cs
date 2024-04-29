@@ -1,30 +1,27 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace FlybuyExample
+namespace FlybuyExample;
+
+public interface IFlybuyService
 {
-    public interface IFlybuyService
-    {
-        Customer CurrentCustomer();
+        public Customer CurrentCustomer();
+        public void CreateCustomer(Customer customer);
 
-        void CreateCustomer(Customer customer);
+        public void UpdateCustomer(Customer customer);
 
-        void UpdateCustomer(Customer customer);
+        public void FetchOrder(string code);
 
-        void FetchOrder(string code);
+        public void ClaimOrder(Order order, Customer customer);
 
-        void ClaimOrder(Order order, Customer customer);
+        public void CreateOrder(Order order, Customer customer);
 
-        void CreateOrder(Order order, Customer customer);
+        public void UpdateOrder(Order order, string customerState);
 
-        void UpdateOrder(Order order, string customerState);
+        public void FetchOrders();
 
-        void FetchOrders();
+        public ObservableCollection<Order> GetOrders();
 
-        ObservableCollection<Order> GetOrders();
+        public ObservableCollection<Site> GetSites();
 
-        ObservableCollection<Site> GetSites();
-
-        void OnMessageReceived(IDictionary<string, object> data);
-    }
+        public void OnMessageReceived(IDictionary<string, object> data);
 }

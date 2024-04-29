@@ -18,12 +18,15 @@ public class MainApplication : MauiApplication
     {
         base.OnCreate();
         
-        string appToken = "427.83r3299CtMi8H2LdNy4ZxAFr";
-        var configOptions = new ConfigOptions.Builder(appToken).Build();
-        Core.Configure(this, configOptions);
+        const string appToken = "426.otMfWCDb4vsYKyZZtociLpJs";
+        
+        var builder = new ConfigOptions.Builder(appToken);
+        builder.SetDeferredLocationTrackingEnabled(true);
+        Core.Configure(this, builder.Build());
+        
         var pickup = PickupManager.Manager.GetInstance(null) as PickupManager;
         pickup!.Configure(this);
     }
-
+    
     protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
 }
