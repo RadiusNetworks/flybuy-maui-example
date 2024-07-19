@@ -5,11 +5,11 @@
 
     <ScrollView>
         <VerticalStackLayout
-            Padding="30,0"
-            Spacing="25">
+            Padding="20,0"
+            Spacing="15">
             <Image
                 Source="flybuy.svg"
-                HeightRequest="185"
+                HeightRequest="90"
                 Aspect="AspectFit"
                 SemanticProperties.Description="flybuy logo" />
 
@@ -45,6 +45,23 @@
                 SemanticProperties.Hint="Update Customer Details"
                 Clicked="OnCustomerClicked"
                 HorizontalOptions="Fill" />
+
+            <Button
+                x:Name="EnRoute"
+                Text="En Route"
+                SemanticProperties.Hint="Set Customer En Route"
+                Clicked="OnEnRouteClicked"
+                BackgroundColor="Green"
+                HorizontalOptions="Fill" />
+
+            <Button
+                x:Name="ImHere"
+                Text="I'm Here"
+                SemanticProperties.Hint="Set Customer Here"
+                Clicked="OnImHereClicked"
+                BackgroundColor="Maroon"
+                HorizontalOptions="Fill" />
+
         </VerticalStackLayout>
     </ScrollView>
 

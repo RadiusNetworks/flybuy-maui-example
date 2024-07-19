@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using FlyBuy;
 using FlyBuy.Data;
+using Java.Time;
 
 namespace FlybuyExample;
 
@@ -25,7 +26,7 @@ public class FlybuyService : IFlybuyService
 
     public void CreateCustomer(Customer customer)
     {
-        Core.customer!.Create(
+        Core.Customer.Create(
             CustomerInfo(customer),
             true, true,
             null, null,
@@ -34,25 +35,31 @@ public class FlybuyService : IFlybuyService
 
     public void UpdateCustomer(Customer customer)
     {
-        Core.customer!.Update(
+        Core.Customer.Update(
             CustomerInfo(customer),
             CustomerCallback);
     }
 
     public void CreateOrder(Order order, Customer customer)
     {
+        DateTime epoch = DateTime.UnixEpoch;
+        TimeSpan ts = order.PickupStart.Subtract(epoch);
+        Instant i = Instant.OfEpochMilli((long)ts.TotalMilliseconds);
+        var pickupWindow = new FlyBuy.Data.PickupWindow(i);
+
         var builder = new OrderOptions.Builder(customer.Name);
         builder.SetCustomerPhone(customer.Phone).SetCustomerCarColor(customer.CarColor)
             .SetCustomerCarType(customer.CarType).SetCustomerCarPlate(customer.CarLicense)
-            .SetPartnerIdentifier(order.Number).SetState("created").SetPickupType(order.PickupType);
-        Core.orders!.Create(order.SiteId(),
+            .SetPartnerIdentifier(order.Number).SetPickupWindow(pickupWindow)
+            .SetState("created").SetPickupType(order.PickupType);
+        Core.Orders.Create(order.SiteId(),
             builder.Build(),
             OrderCallback);
     }
 
     public void FetchOrder(string code)
     {
-        Core.orders!.Fetch(
+        Core.Orders.Fetch(
             code,
             OrderCallback);
     }
@@ -63,24 +70,24 @@ public class FlybuyService : IFlybuyService
             .SetCustomerCarColor(customer.CarColor).SetCustomerCarType(customer.CarType)
             .SetCustomerCarPlate(customer.CarLicense).SetPickupType(order.PickupType);
 
-        Core.orders!.Claim(order.Code, builder.Build(), OrderCallback);
+        Core.Orders.Claim(order.Code, builder.Build(), OrderCallback);
     }
 
     public void UpdateOrder(Order order, string customerState)
     {
-        Core.orders!.UpdateCustomerState(
+        Core.Orders.UpdateCustomerState(
             order.Id, customerState,
             OrderCallback);
     }
 
     public void FetchOrders()
     {
-        Core.orders!.Fetch(OrderCallback);
+        Core.Orders.Fetch(OrderCallback);
     }
 
     public Customer CurrentCustomer()
     {
-        FlyBuy.Data.Customer customer = Core.customer.Current;
+        FlyBuy.Data.Customer customer = Core.Customer.Current;
 
         if (customer == null)
         {
@@ -98,7 +105,7 @@ public class FlybuyService : IFlybuyService
     public ObservableCollection<Order> GetOrders()
     {
         Orders.Clear();
-        foreach (FlyBuy.Data.Order order in Core.orders.Open)
+        foreach (FlyBuy.Data.Order order in Core.Orders.Open)
         {
             var flybuySite = order.Site;
             var site = new Site(
@@ -121,7 +128,7 @@ public class FlybuyService : IFlybuyService
     {
         if (Sites.Count == 0)
         {
-            foreach (FlyBuy.Data.Site site in Core.sites.All)
+            foreach (FlyBuy.Data.Site site in Core.Sites.All)
             {
                 Sites.Add(new Site(site.Id, site.PartnerIdentifier, site.Name, site.Description));
             }
@@ -177,10 +184,6 @@ class OrderCallback : Java.Lang.Object, Kotlin.Jvm.Functions.IFunction2
             if (order != null)
             {
                 string s = order.CustomerState;
-                string p = order.Customer.Phone!;
-                string n = order.Customer.Name;
-                Console.WriteLine("Order Phone: " + p);
-                Console.WriteLine("Order Name: " + n);
                 Console.WriteLine("Order [" + order.PartnerIdentifier + "] callback success");
             }
             else

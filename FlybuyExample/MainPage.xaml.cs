@@ -4,58 +4,77 @@ namespace FlybuyExample;
 
 public partial class MainPage : ContentPage
 {
-    private IFlybuyService flybuy;
-    private Customer customer;
-    private Order order = null!;
-    private bool createCust = false;
+    private IFlybuyService _flybuy;
+    private readonly Customer _customer;
+    private Order _order = null!;
+    private bool _createCust = false;
 
     public MainPage(IFlybuyService flybuy)
     {
         InitializeComponent();
 
-        this.flybuy = flybuy;
+        this._flybuy = flybuy;
 
-        customer = flybuy.CurrentCustomer();
-        if (customer == null)
+        _customer = flybuy.CurrentCustomer();
+        if (_customer == null)
         {
-            createCust = true;
-            customer = new Customer();
+            _createCust = true;
+            _customer = new Customer();
         }
         else
         {
-            CustName.Text = customer.Name;
-            CustPhone.Text = customer.Phone;
+            _createCust = false;
+            CustName.Text = _customer.Name;
+            CustPhone.Text = _customer.Phone;
         }
 
         ObservableCollection<Order> orders = flybuy.GetOrders();
         if (orders.Count > 0)
         {
-            order = orders.First();
+            _order = orders.First();
         }
     }
 
     private void OnCustomerClicked(object sender, EventArgs e)
     {
-        customer.Name = CustName.Text;
-        customer.Phone = CustPhone.Text;
+        _customer.Name = CustName.Text;
+        _customer.Phone = CustPhone.Text;
 
-        if (createCust)
+        if (_createCust)
         {
-            flybuy.CreateCustomer(customer);
+            _flybuy.CreateCustomer(_customer);
         }
         else
         {
-            flybuy.UpdateCustomer(customer);
+            _flybuy.UpdateCustomer(_customer);
         }        
     }
 
     private void OnOrderRedeem(object sender, EventArgs e)
     {
-        order = new Order();
-        order.Code = RedeemCode.Text;
-        if (order.Code != null)
+        _order = new Order();
+        _order.Code = RedeemCode.Text;
+        if (_order.Code != null)
         {
-            flybuy.ClaimOrder(order, customer);
+            _flybuy.ClaimOrder(_order, _customer);
+        }
+    }
+
+    private void OnEnRouteClicked(object sender, EventArgs e)
+    {
+        if (_order.Id > 0)
+        {
+            _flybuy.UpdateOrder(_order, "en_route");
+            Console.WriteLine("Customer En Route");
+        }
+    }
+
+    private void OnImHereClicked(object sender, EventArgs e)
+    {
+        if (_order.Id > 0)
+        {
+            _flybuy.UpdateOrder(_order, "waiting");
+            Console.WriteLine("Customer Here");
         }
     }
 }
